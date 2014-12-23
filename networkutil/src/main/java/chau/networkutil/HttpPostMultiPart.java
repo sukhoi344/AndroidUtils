@@ -43,7 +43,9 @@ import chau.networkutil.security.CustomX509TrustManager;
 /**
  * Created by chauthai on 12/23/14.
  */
-public class HttpPostMultiPart {private static final long CONN_MGR_TIMEOUT = 20000;
+public class HttpPostMultiPart {
+
+    private static final long CONN_MGR_TIMEOUT = 20000;
     private static final int CONN_TIMEOUT = 60000;
     private static final int SO_TIMEOUT = 60000;
 
