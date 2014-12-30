@@ -60,7 +60,7 @@ public class CryptUtil {
      * @throws UnsupportedEncodingException
      */
     public static String encrypt(String property) throws GeneralSecurityException, UnsupportedEncodingException {
-        return base64Encode(getCipher().doFinal(property.getBytes("UTF-8")));
+        return base64Encode(getCipher(Cipher.ENCRYPT_MODE).doFinal(property.getBytes("UTF-8")));
     }
 
     /**
@@ -71,10 +71,10 @@ public class CryptUtil {
      * @throws IOException
      */
     public static String decrypt(String property) throws GeneralSecurityException, IOException {
-        return new String(getCipher().doFinal(base64Decode(property)), "UTF-8");
+        return new String(getCipher(Cipher.DECRYPT_MODE).doFinal(base64Decode(property)), "UTF-8");
     }
 
-    private static Cipher getCipher() throws
+    private static Cipher getCipher(int mode) throws
             NoSuchAlgorithmException,
             InvalidKeySpecException,
             NoSuchPaddingException,
@@ -84,7 +84,7 @@ public class CryptUtil {
         SecretKeyFactory keyFactory = SecretKeyFactory.getInstance("PBEWithMD5AndDES");
         SecretKey key = keyFactory.generateSecret(new PBEKeySpec(PASSWORD));
         Cipher pbeCipher = Cipher.getInstance("PBEWithMD5AndDES");
-        pbeCipher.init(Cipher.ENCRYPT_MODE, key, new PBEParameterSpec(SALT, 20));
+        pbeCipher.init(mode, key, new PBEParameterSpec(SALT, 20));
 
         return pbeCipher;
     }
