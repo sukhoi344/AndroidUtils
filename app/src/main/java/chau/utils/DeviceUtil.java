@@ -55,22 +55,26 @@ public class DeviceUtil {
                 (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
         String id = telephonyManager.getDeviceId();
 
-        if (id == null)
+        if (id == null || id.isEmpty())
             id = telephonyManager.getSubscriberId();
 
-        if (id == null)
+        if (id == null || id.isEmpty())
             id = telephonyManager.getSimSerialNumber();
 
-        if (id == null) {
+        if (id == null || id.isEmpty()) {
             WifiManager m_wm = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
             if (m_wm != null)
                 id = m_wm.getConnectionInfo().getMacAddress();
         }
 
-        if (id == null)
-            Settings.Secure.getString(context.getContentResolver(), Settings.Secure.ANDROID_ID);
 
-        return telephonyManager.getDeviceId();
+        if (id == null || id.isEmpty())
+            id = Settings.Secure.getString(context.getContentResolver(), Settings.Secure.ANDROID_ID);
+
+        if (id == null || id.isEmpty())
+            id = telephonyManager.getDeviceId();
+
+        return id;
     }
 
     /** Get the Wifi Mac address. If wifi is not available, use device id instead */
