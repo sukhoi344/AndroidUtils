@@ -67,7 +67,6 @@ public class DeviceUtil {
                 id = m_wm.getConnectionInfo().getMacAddress();
         }
 
-
         if (id == null || id.isEmpty())
             id = Settings.Secure.getString(context.getContentResolver(), Settings.Secure.ANDROID_ID);
 

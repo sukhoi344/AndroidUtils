@@ -64,4 +64,77 @@ public class StringUtil {
 
         return sb.toString();
     }
+
+    /**
+     * Convert a formatted phone number into a plain digit-only
+     * phonumber
+     * @param phoneNumber
+     * @return empty string if failed.
+     */
+    public static String getPlainPhoneNumber(String phoneNumber) {
+        if (phoneNumber == null || phoneNumber.isEmpty())
+            return "";
+
+        String newPhoneNumber = new String(phoneNumber);
+
+        newPhoneNumber = newPhoneNumber.replace(" ", "");
+        newPhoneNumber = newPhoneNumber.replace("(", "");
+        newPhoneNumber = newPhoneNumber.replace("-", "");
+        newPhoneNumber = newPhoneNumber.replace(")", "");
+        newPhoneNumber = newPhoneNumber.replace("+", "");
+
+        if (!newPhoneNumber.startsWith("1")) {
+            newPhoneNumber = "1" + newPhoneNumber;
+        }
+
+        return newPhoneNumber;
+    }
+
+    /**
+     * Format plain phone number into a formatted string
+     * @param phoneNumber
+     */
+    public static String formatPhoneNumber(String phoneNumber) {
+        if(phoneNumber == null || phoneNumber.isEmpty() || phoneNumber.length() < 10) {
+            return phoneNumber;
+        }
+
+        char[] chars = phoneNumber.toCharArray();
+        StringBuilder sb = new StringBuilder();
+
+        if(chars.length == 10) {
+            sb.append("(" + chars[0]);
+            sb.append(chars[1]);
+            sb.append(chars[2]);
+            sb.append(")-");
+            sb.append(chars[3]);
+            sb.append(chars[4]);
+            sb.append(chars[5]);
+            sb.append("-");
+            sb.append(chars[6]);
+            sb.append(chars[7]);
+            sb.append(chars[8]);
+            sb.append(chars[9]);
+
+            return sb.toString();
+
+        } else if (chars.length == 11) {
+            sb.append("(" + chars[1]);
+            sb.append(chars[2]);
+            sb.append(chars[3]);
+            sb.append(")-");
+            sb.append(chars[4]);
+            sb.append(chars[5]);
+            sb.append(chars[6]);
+            sb.append("-");
+            sb.append(chars[7]);
+            sb.append(chars[8]);
+            sb.append(chars[9]);
+            sb.append(chars[10]);
+
+            return sb.toString();
+        }
+
+        return phoneNumber;
+    }
 }
