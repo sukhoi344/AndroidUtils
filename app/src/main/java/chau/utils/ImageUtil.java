@@ -121,38 +121,47 @@ public class ImageUtil {
      * Reshape the bitmap into a rounded shape
      * @param bitmap orignal bitmap
      * @param radius circle radius in px
-     * @return reshaped bitmap
+     * @return reshaped bitmap, return null if fail
      */
     public static Bitmap getCircleShape(Bitmap bitmap, int radius) {
-        Bitmap sbmp;
+        if (bitmap == null)
+            return null;
 
-        if (bitmap.getWidth() != radius || bitmap.getHeight() != radius) {
-            float smallest = Math.min(bitmap.getWidth(), bitmap.getHeight());
-            float factor = smallest / radius;
-            sbmp = Bitmap.createScaledBitmap(bitmap, (int)(bitmap.getWidth() / factor),
-                    (int)(bitmap.getHeight() / factor), false);
-        } else {
-            sbmp = bitmap;
+        try {
+            Bitmap sbmp;
+
+            if (bitmap.getWidth() != radius || bitmap.getHeight() != radius) {
+                float smallest = Math.min(bitmap.getWidth(), bitmap.getHeight());
+                float factor = smallest / radius;
+                sbmp = Bitmap.createScaledBitmap(bitmap, (int) (bitmap.getWidth() / factor),
+                        (int) (bitmap.getHeight() / factor), false);
+            } else {
+                sbmp = bitmap;
+            }
+
+            Bitmap output = Bitmap.createBitmap(radius, radius,
+                    Bitmap.Config.ARGB_8888);
+            Canvas canvas = new Canvas(output);
+
+            final Paint paint = new Paint();
+            final Rect rect = new Rect(0, 0, radius, radius);
+
+            paint.setAntiAlias(true);
+            paint.setFilterBitmap(true);
+            paint.setDither(true);
+            canvas.drawARGB(0, 0, 0, 0);
+            paint.setColor(Color.parseColor("#BAB399"));
+            canvas.drawCircle(radius / 2 + 0.7f,
+                    radius / 2 + 0.7f, radius / 2 + 0.1f, paint);
+            paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_IN));
+            canvas.drawBitmap(sbmp, rect, rect, paint);
+
+            return output;
+        } catch (Exception e) {
+            e.printStackTrace();
         }
 
-        Bitmap output = Bitmap.createBitmap(radius, radius,
-                Bitmap.Config.ARGB_8888);
-        Canvas canvas = new Canvas(output);
-
-        final Paint paint = new Paint();
-        final Rect rect = new Rect(0, 0, radius, radius);
-
-        paint.setAntiAlias(true);
-        paint.setFilterBitmap(true);
-        paint.setDither(true);
-        canvas.drawARGB(0, 0, 0, 0);
-        paint.setColor(Color.parseColor("#BAB399"));
-        canvas.drawCircle(radius / 2 + 0.7f,
-                radius / 2 + 0.7f, radius / 2 + 0.1f, paint);
-        paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_IN));
-        canvas.drawBitmap(sbmp, rect, rect, paint);
-
-        return output;
+        return null;
     }
 
     /**
