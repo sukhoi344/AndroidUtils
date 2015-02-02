@@ -49,6 +49,28 @@ public class ImageUtil {
     }
 
     /**
+     * Adjust size of the bitmap to fit the screen height
+     * @param bitmap to be adjusted
+     * @return adjusted bitmap
+     */
+    public static Bitmap fitBitmapScreenHeight(Bitmap bitmap) {
+        try {
+            int screenHeight = getScreenHeight();
+
+            double ratio = (double) bitmap.getWidth() / bitmap.getHeight();
+            int imageHeight = screenHeight;
+            int imageWidth = (int) (imageHeight * ratio);
+
+            return Bitmap.createScaledBitmap(bitmap, imageWidth, imageHeight, true);
+
+        } catch (OutOfMemoryError e) {
+            Log.e("Image view helper", "out of memory error when resize image");
+        }
+
+        return bitmap;
+    }
+
+    /**
      * Resize bitmap to match the new height with correct ratio
      * @param bitmap to be adjusted
      * @param newHeight new height of the bitmap
