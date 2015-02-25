@@ -30,10 +30,6 @@ import java.util.List;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
 
-import chau.networkutil.crypt.DecryptException;
-import chau.networkutil.crypt.Decryptor;
-import chau.networkutil.crypt.EncryptException;
-import chau.networkutil.crypt.Encryptor;
 import chau.networkutil.security.CustomSSLSocketFactory;
 import chau.networkutil.security.CustomX509TrustManager;
 
@@ -48,25 +44,20 @@ public class MyHttpPost {
     private final String URL;
     private List<NameValuePair> nameValuePairs = new ArrayList<>();
 
-    private Encryptor encryptor = null;
-    private Decryptor decryptor = null;
 
     public MyHttpPost(String url) {
         this.URL = url;
     }
 
     /** Add name and value param to POST request  */
-    public void addParams(String name, String value) throws EncryptException {
-        if (encryptor != null) {
-            value = encryptor.encrypt(value);
-        }
+    public void addParams(String name, String value)  {
         nameValuePairs.add(new BasicNameValuePair(name, value));
     }
 
     /** Execute Http POST request and return the respond data */
     public String getResponse() throws IOException, NoSuchAlgorithmException, KeyManagementException,
             UnrecoverableKeyException,
-            KeyStoreException, DecryptException
+            KeyStoreException
     {
         SSLContext ctx = SSLContext.getInstance("TLS");
         ctx.init(null, new TrustManager[] { new CustomX509TrustManager() },
@@ -99,19 +90,7 @@ public class MyHttpPost {
 
 //        Log.d("HttpPost", "HttpPost response: " + responseString);
 
-        if (decryptor != null) {
-            responseString = decryptor.decrypt(responseString);
-        }
-
         return responseString;
-    }
-
-    public void setEncryptor(Encryptor encryptor) {
-        this.encryptor = encryptor;
-    }
-
-    public void setDecryptor(Decryptor decryptor) {
-        this.decryptor = decryptor;
     }
 
     private void printRequest(HttpPost httpPost) {

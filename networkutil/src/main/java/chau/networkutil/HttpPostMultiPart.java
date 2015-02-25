@@ -33,10 +33,6 @@ import java.security.UnrecoverableKeyException;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
 
-import chau.networkutil.crypt.DecryptException;
-import chau.networkutil.crypt.Decryptor;
-import chau.networkutil.crypt.EncryptException;
-import chau.networkutil.crypt.Encryptor;
 import chau.networkutil.security.CustomSSLSocketFactory;
 import chau.networkutil.security.CustomX509TrustManager;
 
@@ -49,9 +45,6 @@ public class HttpPostMultiPart {
     private static final int CONN_TIMEOUT = 60000;
     private static final int SO_TIMEOUT = 60000;
 
-    private Encryptor encryptor = null;
-    private Decryptor decryptor = null;
-
     private final String URL;
     private MultipartEntityBuilder builder;
 
@@ -63,8 +56,6 @@ public class HttpPostMultiPart {
 
     public boolean addParams(String name, String value) {
         try {
-            if (encryptor != null)
-                value = encryptor.encrypt(value);
             builder.addPart(name, new StringBody(value, ContentType.DEFAULT_TEXT));
         } catch (Exception e) {
             e.printStackTrace();
@@ -74,7 +65,7 @@ public class HttpPostMultiPart {
         return true;
     }
 
-    public boolean addFile(String name, File file) throws EncryptException {
+    public boolean addFile(String name, File file) {
         if (file != null) {
             FileBody fileBody = new FileBody(file);
             builder.addPart(name, fileBody);
@@ -83,16 +74,13 @@ public class HttpPostMultiPart {
         return true;
     }
 
-    public boolean addBitmap(String name, Bitmap bitmap) throws EncryptException {
+    public boolean addBitmap(String name, Bitmap bitmap) {
         if(bitmap == null)
             return false;
 
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
         bitmap.compress(Bitmap.CompressFormat.JPEG, 75, bos);
         byte[] data = bos.toByteArray();
-
-        if (encryptor != null)
-            data = encryptor.encrypt(data);
 
         ByteArrayBody bab = new ByteArrayBody(data, ContentType.create("image/jpeg"), "image.jpg");
         builder.addPart(name, bab);
@@ -102,7 +90,7 @@ public class HttpPostMultiPart {
 
     public String getResponse() throws IOException, NoSuchAlgorithmException, KeyManagementException,
             UnrecoverableKeyException,
-            KeyStoreException, DecryptException {
+            KeyStoreException {
 
         HttpClient httpClient = new DefaultHttpClient();
         HttpPost httpPost = new HttpPost(URL);
@@ -134,20 +122,9 @@ public class HttpPostMultiPart {
 
         String responseString = EntityUtils.toString(httpResponse.getEntity());
 
-        if (decryptor != null) {
-            responseString = decryptor.decrypt(responseString);
-        }
 //        Log.d("HttpPostMultipart", "HttpPost response: " + responseString);
 
         return responseString;
-    }
-
-    public void setEncryptor(Encryptor encryptor) {
-        this.encryptor = encryptor;
-    }
-
-    public void setDecryptor(Decryptor decryptor) {
-        this.decryptor = decryptor;
     }
 
     private void printResponse(HttpResponse response) {
