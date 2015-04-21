@@ -6,8 +6,10 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.provider.MediaStore;
 
+import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.FilenameFilter;
@@ -27,6 +29,42 @@ public class FileUtil {
     /** for validating folder name */
     public static final String folderRegex = "(([a-z])| |([A-Z])|\\(|\\)"
             + "|[0-9]|_|-|\\+|=|`|~|;|!|@|\\.|\\[|\\]|\\{|\\})+";
+
+    /**
+     * Read bytes from a file path
+     * @param path path to the file
+     * @return null if fails
+     */
+    public static byte[] getBytesFromPath(String path) {
+        if (path == null || path.isEmpty())
+            return null;
+
+        File file = new File(path);
+        if (file.length() <=0)
+            return null;
+
+        InputStream is = null;
+
+        try {
+            int size = (int) file.length();
+            byte[] data = new byte[size];
+            is = new BufferedInputStream(new FileInputStream(file));
+            is.read(data);
+
+            return data;
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            if (is != null) {
+                try {
+                    is.close();
+                } catch (Throwable ignore) {}
+            }
+        }
+
+        return null;
+    }
 
     /**
      * Read text from from a file object
