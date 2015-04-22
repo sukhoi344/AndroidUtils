@@ -68,7 +68,7 @@ public class StringUtil {
 
     /**
      * Convert a formatted phone number into a plain digit-only
-     * phonumber
+     * phone number
      * @param phoneNumber
      * @return empty string if failed.
      */
@@ -84,7 +84,7 @@ public class StringUtil {
         newPhoneNumber = newPhoneNumber.replace(")", "");
         newPhoneNumber = newPhoneNumber.replace("+", "");
 
-        if (!newPhoneNumber.startsWith("1")) {
+        if (!newPhoneNumber.startsWith("1") && newPhoneNumber.length() == 10) {
             newPhoneNumber = "1" + newPhoneNumber;
         }
 
