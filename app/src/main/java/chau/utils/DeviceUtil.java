@@ -3,6 +3,7 @@ package chau.utils;
 import android.app.Activity;
 import android.content.Context;
 import android.content.pm.PackageInfo;
+import android.media.AudioManager;
 import android.media.Ringtone;
 import android.media.RingtoneManager;
 import android.net.ConnectivityManager;
@@ -113,16 +114,30 @@ public class DeviceUtil {
 
     /** Vibrate the device  */
     public static void vibrate(Context context, long milisecs) {
-        Vibrator v = (Vibrator) context.getSystemService(Context.VIBRATOR_SERVICE);
-        v.vibrate(milisecs);
+        try {
+            AudioManager audioManager = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
+            int ringerMode = audioManager.getRingerMode();
+
+            if (ringerMode != AudioManager.RINGER_MODE_SILENT) {
+                Vibrator v = (Vibrator) context.getSystemService(Context.VIBRATOR_SERVICE);
+                v.vibrate(milisecs);
+            }
+        } catch (Exception ignore) {}
     }
 
     /** Play notification sound */
     public static void playNotification(Context context) {
-        Uri notification = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
-        if(notification != null) {
-            Ringtone r = RingtoneManager.getRingtone(context, notification);
-            r.play();
-        }
+        try {
+            AudioManager audioManager = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
+            int ringerMode = audioManager.getRingerMode();
+
+            if (ringerMode == AudioManager.RINGER_MODE_NORMAL) {
+                Uri notification = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+                if(notification != null) {
+                    Ringtone r = RingtoneManager.getRingtone(context, notification);
+                    r.play();
+                }
+            }
+        } catch (Exception ignore) {}
     }
 }
