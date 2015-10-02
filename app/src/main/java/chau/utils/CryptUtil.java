@@ -1,5 +1,6 @@
 package chau.utils;
 
+import android.support.annotation.NonNull;
 import android.util.Base64;
 
 import java.io.IOException;
@@ -48,30 +49,81 @@ public class CryptUtil {
      * @param password array of bytes
      */
     public static void setPassword(char[] password) {
-       if (password != null && password.length != 0)
-           PASSWORD = password;
+        if (password != null && password.length != 0)
+            PASSWORD = password;
     }
 
     /**
-     * Encrypt String object
-     * @param property
+     * Encrypt String object with the default salt and password
+     * @param property String to be encrypted
      * @return encrypted string
      * @throws GeneralSecurityException
      * @throws UnsupportedEncodingException
      */
-    public static String encrypt(String property) throws GeneralSecurityException, UnsupportedEncodingException {
+    public static String encrypt(@NonNull String property) throws GeneralSecurityException, UnsupportedEncodingException {
         return base64Encode(getCipher(Cipher.ENCRYPT_MODE).doFinal(property.getBytes("UTF-8")));
     }
 
     /**
-     * Decrypt encrypted String object
-     * @param property
+     * Encrypt String object
+     * @param property String to be encrypted
+     * @param salt for obfuscation
+     * @param password to decrypt later
+     * @return encrypted String
+     * @throws GeneralSecurityException
+     * @throws UnsupportedEncodingException
+     */
+    public static String encrypt(@NonNull String property, @NonNull String salt, @NonNull String password)
+            throws GeneralSecurityException, UnsupportedEncodingException {
+        final byte[] saltBytes = salt.getBytes("UTF-8");
+        final char[] passChars = password.toCharArray();
+
+        return base64Encode(getCipher(Cipher.ENCRYPT_MODE, saltBytes, passChars)
+                .doFinal(property.getBytes("UTF-8")));
+    }
+
+    /**
+     * Decrypt encrypted String object with the default salt and password
+     * @param property String to be decrypted
      * @return decrypted string
      * @throws GeneralSecurityException
      * @throws IOException
      */
-    public static String decrypt(String property) throws GeneralSecurityException, IOException {
+    public static String decrypt(@NonNull String property) throws GeneralSecurityException, IOException {
         return new String(getCipher(Cipher.DECRYPT_MODE).doFinal(base64Decode(property)), "UTF-8");
+    }
+
+    /**
+     * Decrypt encrypted String object
+     * @param property String to be decrypted
+     * @param salt used for obfuscation
+     * @param password used to encrypt
+     * @return decrypted String
+     * @throws GeneralSecurityException
+     * @throws IOException
+     */
+    public static String decrypt(@NonNull String property, @NonNull String salt, @NonNull String password)
+            throws GeneralSecurityException, IOException {
+        final byte[] saltBytes = salt.getBytes("UTF-8");
+        final char[] passChars = password.toCharArray();
+
+        return new String(getCipher(Cipher.DECRYPT_MODE, saltBytes, passChars)
+                .doFinal(base64Decode(property)), "UTF-8");
+    }
+
+    private static Cipher getCipher(int mode, byte[] salt, char[] password) throws
+            NoSuchAlgorithmException,
+            InvalidKeySpecException,
+            NoSuchPaddingException,
+            InvalidKeyException,
+            InvalidAlgorithmParameterException {
+
+        SecretKeyFactory keyFactory = SecretKeyFactory.getInstance("PBEWithMD5AndDES");
+        SecretKey key = keyFactory.generateSecret(new PBEKeySpec(password));
+        Cipher pbeCipher = Cipher.getInstance("PBEWithMD5AndDES");
+        pbeCipher.init(mode, key, new PBEParameterSpec(salt, 20));
+
+        return pbeCipher;
     }
 
     private static Cipher getCipher(int mode) throws
@@ -80,13 +132,7 @@ public class CryptUtil {
             NoSuchPaddingException,
             InvalidKeyException,
             InvalidAlgorithmParameterException {
-
-        SecretKeyFactory keyFactory = SecretKeyFactory.getInstance("PBEWithMD5AndDES");
-        SecretKey key = keyFactory.generateSecret(new PBEKeySpec(PASSWORD));
-        Cipher pbeCipher = Cipher.getInstance("PBEWithMD5AndDES");
-        pbeCipher.init(mode, key, new PBEParameterSpec(SALT, 20));
-
-        return pbeCipher;
+        return getCipher(mode, SALT, PASSWORD);
     }
 
     private static String base64Encode(byte[] bytes) {
