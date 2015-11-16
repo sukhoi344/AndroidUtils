@@ -244,18 +244,14 @@ public class ImageUtil {
         return metrics.heightPixels;
     }
 
-    /** Convert DP to pixels */
-    public static int getPixelFromDP(int dp) {
-        Resources r = Resources.getSystem();
-        float px = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp, r.getDisplayMetrics());
-        return (int) px;
+    public static int dpFromPx(final int px) {
+        return (int) (px / Resources.getSystem().getDisplayMetrics().density);
     }
 
-    /** Convert pixels to DP */
-    public static int getDPFromPixel(int px) {
-        float scale = Resources.getSystem().getDisplayMetrics().density;
-        return (int) (16.0f * scale + 0.5f);
+    public static int pxFromDp(final int dp) {
+        return (int) (dp * Resources.getSystem().getDisplayMetrics().density);
     }
+
 
     /**
      * Get status bar height.
